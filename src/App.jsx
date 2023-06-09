@@ -1,37 +1,31 @@
-import React, { useEffect, useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import { Container } from "react-bootstrap";
-import "./App.css";
-import Formulario from "./components/Formulario";
-import Lista from "./components/Lista";
+import React, { useState } from 'react';
+import Form from './components/Form';
+import Weather from './components/Weather';
+import { Container } from 'react-bootstrap';
+import './App.css';
 
-function App() {
-  const [noticias, setNoticias] = useState([]);
+const App = () => {
+  const [weatherData, setWeatherData] = useState(null);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    consultarAPI("");
-  }, []);
-
-  const consultarAPI = async (categoriaSeleccionada) => {
-    try {
-      const respuesta = await fetch(
-        `https://newsapi.org/v2/top-headlines?country=us&category=${categoriaSeleccionada}&apiKey=72f84f7c14754936a842fd3856e7d76a`
-      );
-      const datos = await respuesta.json();
-      setNoticias(datos.articles || []);
-    } catch (error) {
-      console.log(error);
+  const handleWeatherData = (data) => {
+    if (data.cod === '404') {
+      setError('No se encontraron datos de la ciudad ingresada.');
+      setWeatherData(null);
+    } else {
+      setWeatherData(data);
+      setError('');
     }
   };
 
   return (
-    <Container className="text-center">
-      <h1>Noticias</h1>
-      <hr />
-      <Formulario consultarAPI={consultarAPI} />
-      <Lista noticias={noticias} />
+    <Container className='centrar'>
+      <h1>Consulta del clima</h1>
+      <Form onWeatherData={handleWeatherData} />
+      {error && <div>{error}</div>}
+      {weatherData && <Weather weatherData={weatherData} />}
     </Container>
   );
-}
+};
 
 export default App;
